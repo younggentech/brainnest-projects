@@ -1,3 +1,12 @@
+# Important note.
+**To run the script create .env file with the following structure:**
+```
+host=host_name_or_ip
+user=username
+psw=password
+```
+For anonymous connect (if the FTP server allows it) leave user and psw empty.
+
 # The task
 You work at a company that receives daily data files from external partners. These files need to be processed and analyzed, but first, they need to be transferred to the company's internal network.
 
