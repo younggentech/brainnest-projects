@@ -1,3 +1,4 @@
+import ftplib
 import os
 import shutil
 import time
@@ -24,13 +25,26 @@ psw = os.environ["psw"]
 
 @repeat(every(10).seconds, host=host, usr=user, psw=psw,
         download_path=path_to_download)  # this decorator will run the next method every specified time
-def download_data_from_ftp_server(host: str, usr: str, psw: str, download_path: str):
+def download_data_from_ftp_server(host: str, usr: str, psw: str, download_path: str) -> None:
+    """
+    Downloads file from specified ftp server
+    :param host:
+    :param usr:
+    :param psw:
+    :param download_path:
+    :return:
+    """
+    if not host or not usr or not psw or not download_path:
+        raise ValueError('Plese provide all params')
     if not os.path.exists(download_path):
         os.mkdir(download_path)
         # raise FileNotFoundError('Local directory for downloading was not find')
 
     with FTP(host) as ftp:
-        ftp.login(user=usr, passwd=psw)
+        try:
+            ftp.login(user=usr, passwd=psw)
+        except ftplib.error_perm:
+            raise ValueError("Incorrect login or password")
         files = ftp.nlst()
         for file in files:
             with open(f'{path_to_download}{"/" if path_to_download[-1] != "/" else ""}{file}', 'wb') as fp:
@@ -53,12 +67,16 @@ def move_downloaded(src: str, dist: str) -> None:
         raise FileNotFoundError("The source file/folder doesn't exists, make sure you entered the correct path.")
 
     try:
-        shutil.move(src=src, dst=dist)
+        if not os.path.exists(dist):
+            os.mkdir(dist)
+        shutil.copytree(src=src, dst=dist, dirs_exist_ok=True)  # method copies data from source path to dest,
+        # overriding existing files
     except shutil.Error as e:
         print(e)
 
 
 if __name__ == '__main__':
+    # TODO: CHANGE SCHEDULER TO WRITE AT EXECT TIME, SET UP LOGGING
     while 1:
         run_pending()
         time.sleep(1)
