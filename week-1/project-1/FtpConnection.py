@@ -2,11 +2,12 @@ import ftplib
 import os
 import shutil
 import time
+import logging
 from ftplib import FTP  # importing library to connect to the server
+from schedule import repeat, every, run_pending
 
 from dotenv import load_dotenv  # importing method to load config data
 from configparser import ConfigParser  # importing file to read configurating params
-from schedule import repeat, every, run_pending
 
 load_dotenv()  # loading config data
 try:  # trying to load settings from config.ini
@@ -14,17 +15,19 @@ try:  # trying to load settings from config.ini
     local_settings.read("config.ini")
     path_to_download = local_settings['local-path']['local-path']
     path_to_move = local_settings['local-path']['moving-path']
+    scheduled_time = local_settings['local-path']['run-time']
 except KeyError:
     path_to_download = './'
     path_to_move = "./moving-folder/"
+    scheduled_time = "9:00"
 
 host = os.environ["host"]
 user = os.environ["user"]
 psw = os.environ["psw"]
 
 
-@repeat(every(10).seconds, host=host, usr=user, psw=psw,
-        download_path=path_to_download)  # this decorator will run the next method every specified time
+# @repeat(every(10).seconds, host=host, usr=user, psw=psw,
+#         download_path=path_to_download)  # this decorator will run the next method every specified time
 def download_data_from_ftp_server(host: str, usr: str, psw: str, download_path: str) -> None:
     """
     Downloads file from specified ftp server
@@ -51,8 +54,8 @@ def download_data_from_ftp_server(host: str, usr: str, psw: str, download_path: 
                 ftp.retrbinary(f'RETR {file}', fp.write)
 
 
-@repeat(every(10).seconds, src=path_to_download,
-        dist=path_to_move)  # this decorator will run the next method every specified time
+# @repeat(every(10).seconds, src=path_to_download,
+#         dist=path_to_move)  # this decorator will run the next method every specified time
 def move_downloaded(src: str, dist: str) -> None:
     """a wrapper method to use `shutil.move()` method
     to move files/folders from source to destination
@@ -75,9 +78,22 @@ def move_downloaded(src: str, dist: str) -> None:
         print(e)
 
 
-if __name__ == '__main__':
-    # TODO: CHANGE SCHEDULER TO WRITE AT EXECT TIME, SET UP LOGGING
+def work(host: str, usr: str, psw: str, download_path: str, dist: str) -> None:
+    print('starting')
+    if not host or not usr or not psw or not download_path or not download_path or not dist:
+        raise ValueError('Plese provide all params')
+    download_data_from_ftp_server(host, usr, psw, download_path)
+    move_downloaded(download_path, dist)
+    print('done')
+
+
+def main():
+    every().day.at(scheduled_time).do(work, host, user, psw, path_to_download, path_to_move)
     while 1:
         run_pending()
         time.sleep(1)
-    # print(3)
+
+
+if __name__ == '__main__':
+    # TODO: SET UP LOGGING
+    main()
