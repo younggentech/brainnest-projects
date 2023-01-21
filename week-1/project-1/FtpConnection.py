@@ -15,7 +15,9 @@ try:  # trying to load settings from config.ini
     local_settings.read("config.ini")
     path_to_download = local_settings["local-path"]["local-path"]
     path_to_move = local_settings["local-path"]["moving-path"]
-    scheduled_time = local_settings["schedule"]["run-time"]  # o start execution current_time < scheduled_time
+    scheduled_time = local_settings["schedule"][
+        "run-time"
+    ]  # o start execution current_time < scheduled_time
 except KeyError:  # if the file wasn't found we put default settings
     path_to_download = "./"
     path_to_move = "./moving-folder/"
@@ -29,16 +31,22 @@ psw = os.environ["psw"]
 
 # specify config for logging, logs go to the terminal and to the file with the name DATE_OF_RUNNING_THE_SCRIPT.log
 # for example 20.01.2023.log
-logging.basicConfig(format="%(asctime)s-%(levelname)s - %(message)s",
-                    level=logging.INFO,
-                    datefmt="%d.%m.%Y %H:%M:%S",
-                    handlers=[
-                        logging.FileHandler(filename=f"{datetime.datetime.now().date().strftime('%d.%m.%Y')}.log"),
-                        logging.StreamHandler()
-                    ])
+logging.basicConfig(
+    format="%(asctime)s-%(levelname)s - %(message)s",
+    level=logging.INFO,
+    datefmt="%d.%m.%Y %H:%M:%S",
+    handlers=[
+        logging.FileHandler(
+            filename=f"{datetime.datetime.now().date().strftime('%d.%m.%Y')}.log"
+        ),
+        logging.StreamHandler(),
+    ],
+)
 
 
-def download_data_from_ftp_server(host: str, usr: str, psw: str, download_path: str) -> None:
+def download_data_from_ftp_server(
+    host: str, usr: str, psw: str, download_path: str
+) -> None:
     """
     Downloads file from specified ftp server
     :param host:
@@ -49,10 +57,14 @@ def download_data_from_ftp_server(host: str, usr: str, psw: str, download_path: 
     """
     if not host or not download_path:  # raise ValueError if not enough params
         raise ValueError("Please provide all params")
-    if not os.path.exists(download_path):  # if local path for download wasn't found, we create a folder
+    if not os.path.exists(
+        download_path
+    ):  # if local path for download wasn't found, we create a folder
         os.mkdir(download_path)
 
-    with FTP(host) as ftp:  # opening connection to ftp server using context manager with
+    with FTP(
+        host
+    ) as ftp:  # opening connection to ftp server using context manager with
         try:  # try to log in to server
             ftp.login(user=usr, passwd=psw)
             logging.info(f"successful login host {usr}@{host}")
@@ -62,7 +74,10 @@ def download_data_from_ftp_server(host: str, usr: str, psw: str, download_path: 
         files = ftp.nlst()  # get names of files in current directory of ftp server
         logging.info(f"downloaded from {host} files: {files}")
         for file in files:  # downloading files to the specified location
-            with open(f"{path_to_download}{'/' if path_to_download[-1] != '/' else ''}{file}", "wb") as fp:
+            with open(
+                f"{path_to_download}{'/' if path_to_download[-1] != '/' else ''}{file}",
+                "wb",
+            ) as fp:
                 ftp.retrbinary(f"RETR {file}", fp.write)
         logging.info(f"downloading from {host} finished")
 
@@ -78,13 +93,19 @@ def move_downloaded(src: str, dist: str) -> None:
         raise ValueError("You must specify both source and destination folders.")
 
     if not os.path.exists(src):
-        raise FileNotFoundError("The source file/folder doesn't exists, make sure you entered the correct path.")
+        raise FileNotFoundError(
+            "The source file/folder doesn't exists, make sure you entered the correct path."
+        )
 
     try:
         logging.info(f"starting transferring from {src} to {dist}")
-        if not os.path.exists(dist):  # creating a destination directory if the one does not exist
+        if not os.path.exists(
+            dist
+        ):  # creating a destination directory if the one does not exist
             os.mkdir(dist)
-        shutil.copytree(src=src, dst=dist, dirs_exist_ok=True)  # method copies data from source path to dest,
+        shutil.copytree(
+            src=src, dst=dist, dirs_exist_ok=True
+        )  # method copies data from source path to dest,
         # overriding existing files
         logging.info(f"transfer finished")
     except shutil.Error as e:
@@ -115,7 +136,9 @@ def work(host: str, usr: str, psw: str, download_path: str, dist: str) -> None:
 def main():
     """Main function. Specifies and runs the scheduler"""
     logging.info("start main")
-    every().day.at(scheduled_time).do(work, host, user, psw, path_to_download, path_to_move)
+    every().day.at(scheduled_time).do(
+        work, host, user, psw, path_to_download, path_to_move
+    )
     while 1:
         run_pending()
         time.sleep(1)
