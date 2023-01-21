@@ -23,11 +23,11 @@ class DataBaseManager:
         try:
             if not db_path.exists():
                 raise FileNotFoundError
+            conn = sql_connect(db_path)
 
         except (TypeError, FileNotFoundError) as e:
-            print(f"DB to path has not been passed correctly:\n\n {e}")
+            print(f"DB to path has not been passed correctly")
         else:
-            conn = sql_connect(db_path)
             return conn
 
     def db_close(self, connector, cursor):
@@ -40,3 +40,31 @@ class DataBaseManager:
 
         else:
             print("All DB connection have been terminated")
+
+def db_create_schema():
+    db_name = "budget_db"
+    db_bugdet = DataBaseManager()
+    db_bugdet.create_db(db_name)
+    db_conn = db_bugdet.db_connect(f"{db_name}.db")
+    if not db_conn:
+        ValueError("DB is not connected")
+    db_cursor = db_conn.cursor()
+    db_cursor.executescript("""
+    CREATE TABLE IF NOT EXISTS budget_trans(
+        id INT PRIMARY KEY, 
+        timestamp DATETIME,
+        amount DOUBLE,
+        typeOfOperation INT2, 
+        habits NVAR(40)
+        );
+        
+    CREATE TABLE IF NOT EXISTS dataGoal(
+        id INT PRIMARY KEY,
+        timestamp DATETIME, 
+        goal_amount DOUBLE
+    
+    );
+    
+    """)
+    db_bugdet.db_close(db_conn, db_cursor)
+    return "DB schemas have been created"
