@@ -41,6 +41,7 @@ class DataBaseManager:
         else:
             print("All DB connection have been terminated")
 
+
 def db_create_schema():
     db_name = "budget_db"
     db_bugdet = DataBaseManager()
@@ -49,22 +50,23 @@ def db_create_schema():
     if not db_conn:
         ValueError("DB is not connected")
     db_cursor = db_conn.cursor()
-    db_cursor.executescript("""
+    db_cursor.executescript(
+        """
     CREATE TABLE IF NOT EXISTS budget_trans(
-        id INT PRIMARY KEY, 
-        timestamp DATETIME,
+        id INT PRIMARY KEY,
+        timestamp DOUBLE,
         amount DOUBLE,
-        typeOfOperation INT2, 
+        typeOfOperation INT2,
         habits NVAR(40)
         );
-        
+
     CREATE TABLE IF NOT EXISTS dataGoal(
         id INT PRIMARY KEY,
-        timestamp DATETIME, 
-        goal_amount DOUBLE
-    
+        timestamp DOUBLE,
+        goalAmount DOUBLE
     );
-    
-    """)
+
+    """
+    )
     db_bugdet.db_close(db_conn, db_cursor)
     return "DB schemas have been created"

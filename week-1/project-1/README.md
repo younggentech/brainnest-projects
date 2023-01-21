@@ -24,4 +24,4 @@ Here are the steps you can take to automate this process:
 
     Use the schedule library to schedule the script to run daily at a specific time.
 
-    You can also set up a log file to keep track of the files that have been transferred and any errors that may have occurred during the transfer process. 
+    You can also set up a log file to keep track of the files that have been transferred and any errors that may have occurred during the transfer process.
