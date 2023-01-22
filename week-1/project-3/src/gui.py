@@ -1,5 +1,7 @@
+from .calls_to_db import get_all_transactions
 from tkinter import *
 from datetime import datetime
+from tkinter import ttk
 
 
 class WindowBudget:
@@ -35,6 +37,31 @@ class WindowBudget:
             budget_win, text="Update Goal Budget", command=self.update_goal_budget
         )
 
+        self.all_trx = ttk.Treeview(budget_win, selectmode="browse")
+        verscrlbar = ttk.Scrollbar(
+            budget_win, orient="vertical", command=self.all_trx.yview
+        )
+        verscrlbar.pack(side="right", fill="x")
+        self.all_trx.configure(xscrollcommand=verscrlbar.set)
+        self.all_trx["columns"] = ("1", "2", "3", "4")
+        self.all_trx["show"] = "headings"
+
+        # Assigning the width and anchor to  the
+        # respective columns
+        self.all_trx.column("1", width=90, anchor="c")
+        self.all_trx.column("2", width=90, anchor="se")
+        self.all_trx.column("3", width=90, anchor="se")
+        self.all_trx.column("4", width=90, anchor="se")
+
+        # Assigning the heading names to the
+        # respective columns
+        self.all_trx.heading("1", text="Date")
+        self.all_trx.heading("2", text="Amount")
+        self.all_trx.heading("3", text="Habit")
+        self.all_trx.heading("4", text="Operation")
+
+        # self.all_trx.configure(command=mylist.yview)
+
         self.lbl_amount.place(x=282, y=180)
         self.txt_fd_amount.place(x=220, y=150)
         self.b1_trx.place(x=50, y=150)
@@ -47,6 +74,14 @@ class WindowBudget:
 
         self.btn5_outcome.place(x=650, y=175)
         self.btn7_income.place(x=650, y=150)
+        self.all_trx.place(x=50, y=250)
+
+        self.render_all_trx()
+
+    def render_all_trx(self):
+        for trx in get_all_transactions():
+            print(trx)
+            self.all_trx.insert("", "end", text="L1", values=trx)
 
     def add_new_trx(self):
         timestamp = datetime.now().timestamp()
