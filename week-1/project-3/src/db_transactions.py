@@ -7,18 +7,6 @@ from typing import Union
 from contextlib import contextmanager
 
 
-@contextmanager
-def open_db(db_name="budget_db.db"):
-    if not os.path.exists("budget_db.db"):
-        db_create_schema()
-    else:
-        connector = DataBaseConnector()
-        try:
-            pass
-        finally:
-            del connector
-
-
 class DataBaseConnector:
     def __init__(self, name="budget_db.db"):
         """Method for inizialization of db"""
@@ -93,6 +81,18 @@ class DataBaseConnector:
         return self.__establish_connection(query, ())
 
 
+@contextmanager
+def open_db(db_name="budget_db.db") -> DataBaseConnector:
+    if not os.path.exists(db_name):
+        db_create_schema(db_name)
+
+    connector = DataBaseConnector(db_name)
+    try:
+        yield connector
+    finally:
+        del connector
+
+
 class DataBaseCreator:
     def create_db(self, db_name: str = None):
         if not db_name:
@@ -133,8 +133,7 @@ class DataBaseCreator:
             print("All DB connection have been terminated")
 
 
-def db_create_schema():
-    db_name = "budget_db"
+def db_create_schema(db_name):
     db_bugdet = DataBaseCreator()
     db_bugdet.create_db(db_name)
     db_conn = db_bugdet.db_connect(f"{db_name}.db")
