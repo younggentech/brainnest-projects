@@ -1,8 +1,65 @@
+import logging
 from pathlib import Path
 from sqlite3 import connect as sql_connect
+from sqlite3 import Error
+from typing import Union
 
 
 class DataBaseManager:
+    pass
+
+
+class DataBaseConnector:
+    def __init__(self, name="budget_db.db"):
+        """Method for inizialization of db"""
+        self.db_name = name
+
+    def __establish_connection(self, query: str, params: tuple) -> Union[tuple, int]:
+        """Service method for query execution"""
+        try:  # trying to connect to database
+            sqlite_connection = sql_connect(self.db_name)
+            cursor = sqlite_connection.cursor()
+        except Exception as e:
+            logging.error(f"establish connection error: {e}", exc_info=True)
+            return 1
+
+        try:  # trying to execute a query
+            logging.info("successful connection; QUERY: {query}; Params: {params}")
+            cursor.execute(query, params)
+            record = cursor.fetchall()
+            sqlite_connection.commit()
+            return record
+
+        except Error as e:
+            logging.error(f"query execution error: {e}", exc_info=True)
+            return 1
+
+        finally:
+            cursor.close()
+
+    def insert_transaction(
+        self, _timestamp: float, _amount: float, type_of_operation: int, habits: str
+    ) -> list:
+        """Inserts new transaction into budget_trans table"""
+        logging.info(
+            f"adding a trx {_timestamp} {_amount} {type_of_operation} {habits}"
+        )
+        query = (
+            f"INSERT INTO budget_trans (timestamp, amount, typeOfOperation, habits) "
+            f"VALUES (?, ?, ?, ?)"
+        )
+        return self.__establish_connection(
+            query, (_timestamp, _amount, type_of_operation, habits)
+        )
+
+    def insert_goal(self, timestamp: float, goal_amount: float) -> list:
+        """Inserts new goal into dataGoal table"""
+        logging.info(f"adding a trx {timestamp} {goal_amount}")
+        query = f"INSERT INTO dataGoal (timestamp, goalAmount) " f"VALUES (?, ?)"
+        return self.__establish_connection(query, (timestamp, goal_amount))
+
+
+class DataBaseCreator:
     def create_db(self, db_name: str = None):
         if not db_name:
             db_name = "db_transaction"
@@ -44,7 +101,7 @@ class DataBaseManager:
 
 def db_create_schema():
     db_name = "budget_db"
-    db_bugdet = DataBaseManager()
+    db_bugdet = DataBaseCreator()
     db_bugdet.create_db(db_name)
     db_conn = db_bugdet.db_connect(f"{db_name}.db")
     if not db_conn:
