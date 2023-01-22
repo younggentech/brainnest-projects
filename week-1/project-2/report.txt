@@ -1,0 +1,20 @@
+Group 2 solution for Automating Email Sending includes these steps:
+1. Import libraries that we use in the project:
+    a. datetime - to add date and time to log files
+    b. os.path - to check whether the attachment file exists or not
+    c. smtplib - to connect to main server and send emails
+    d. time -to "sleep", pause of execution for a specified time
+    e. logging - to create log files and also log info to the console
+    f. email - library to make sent emails fancy and contains attachments
+    g. schedule - to schedule the execution of the code to the specified time
+    h. configparser - to read config.ini file with the configuration settings (scheduled time, sender email, and its password)
+2. defined a variables to hold the email's subject, attachments list path, recipients list, and the port number
+3. defined a dictionary to hold the smtps config for gmail, and outlook, with the ability to add a new smtp
+4. loading the config values from config.ini file, lines 31 - 40
+5. Configurating logging to log information and errors into both: a log file and a console lines 44 - 54
+6. Function main will start by getting the smtp of the sender_email define in the config.ini file, by extraction the domain from the email.
+    then defined a message to be specified with subject, from email, and append the attachments to it
+    after that, login to the server using the sender email and password.
+    finally, for every recipient in recipients list, send email with all data in it.
+7. main function is used to set up a scheduler to run work function with params taken from .env and config.ini files. the time is configured in the config.ini file.
+8. Lines 98 - 101 start the main function and exit if user stopped the program
