@@ -1,12 +1,22 @@
 import logging
+import os.path
 from pathlib import Path
 from sqlite3 import connect as sql_connect
 from sqlite3 import Error
 from typing import Union
+from contextlib import contextmanager
 
 
-def open_db():
-    pass
+@contextmanager
+def open_db(db_name="budget_db.db"):
+    if not os.path.exists("budget_db.db"):
+        db_create_schema()
+    else:
+        connector = DataBaseConnector()
+        try:
+            pass
+        finally:
+            del connector
 
 
 class DataBaseConnector:
