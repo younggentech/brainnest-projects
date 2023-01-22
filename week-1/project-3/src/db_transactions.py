@@ -58,6 +58,30 @@ class DataBaseConnector:
         query = f"INSERT INTO dataGoal (timestamp, goalAmount) " f"VALUES (?, ?)"
         return self.__establish_connection(query, (timestamp, goal_amount))
 
+    def get_all_trx(self) -> list:
+        """Select * from budget_trans"""
+        logging.info(f"get_all_trx")
+        query = f"SELECT * FROM budget_trans"
+        return self.__establish_connection(query, ())
+
+    def get_current_goal(self) -> list:
+        """Select * with max timestamp"""
+        logging.info(f"get_current_goal")
+        query = f"SELECT * FROM dataGoal WHERE timestamp=MAX(SELECT timestamp from dataGoal)"
+        return self.__establish_connection(query, ())
+
+    def get_spending_trx(self) -> list:
+        """Select * from budget_trans where typeOfOperation=1"""
+        logging.info(f"get_spending_trx")
+        query = f"SELECT * FROM budget_trans WHERE typeOfOperation=1"
+        return self.__establish_connection(query, ())
+
+    def get_income_trx(self) -> list:
+        """Select * from budget_trans where typeOfOperation=0"""
+        logging.info(f"get_income_trx")
+        query = f"SELECT * FROM budget_trans WHERE typeOfOperation=0"
+        return self.__establish_connection(query, ())
+
 
 class DataBaseCreator:
     def create_db(self, db_name: str = None):
