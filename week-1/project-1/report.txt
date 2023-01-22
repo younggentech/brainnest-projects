@@ -1,0 +1,32 @@
+Group 2 solution for FTP server file transfering automation includes these steps:
+1. Import libraries that we use in the project:
+    a. datetime - to add date and time to log files
+    b. os - to check whether the file exists or not and create new files (generally operations with operating system)
+    c. shutil - to move files from one directory to another one
+    d. time -to "sleep", pause of execution for a specified time
+    e. logging - to create log files and also log info to the console
+    f. ftplib - library to communicate with the FTP server
+    g. schedule - to schedule the execution of the code to the specified time
+    h. dotenv - to read .env file with FTP server credentials. As we use GitHub for our collaboration, this file is specified in .gitignore file,
+     but this file will be a part of our solution in order to demonstrate that the code works as intended.
+    i. configparser - to read config.ini file with the configuration settings (scheduled time, path where files should be downloaded,
+    path where files should be transfered)
+2. Loading data from .env and config.ini files (lines 12-30). If config.ini file was not found, program will operate on default settings.
+3. Configurating logging to log information and errors into both: a log file and a console
+4. Function download_data_from_ftp_server takes as paramets strings: host, usr, psw, download_path.
+   This information is required to login to the ftp server and download data from it to the local download_path folder.
+   It checks for host and download_path as for required params, if download_path folder doesn't exist, function creates it.
+   If usr and psw are not specified, the function considers it as an anonymous login that is allowed by some FTP servers.
+   Lines 65-73 are responsible for connecting to the FTP server, if credentials are not correct, it will raise ValueError
+   In line 74 files represent a list of strings that are names in current ftp server directory.
+   Than the function iterates through the files and downloads each file into the download_path directory saving the original naming of the file
+5. move_downloaded function rakes as params strings src and dist, these strings represent the directories.
+   Src directory is the directory where files were downloaded on the previous step.
+   Dist directory is the directory where files should be moved.
+   If src path does not exist, the error will be raise, if the dist directory does not exist, it would be created.
+   In line 106, function copies files to the dist directory, overriding files with the same names if they exist
+6. work function bring previous two functions together, as params it takes the combination of download_data_from_ftp_server and move_downloaded,
+   as download_path = src, it is the one param called download_path.
+   Work function checks if all necessary params were given and firstly launches download_data_from_ftp_server, then move_downloadedfunctions.
+7. main function is used to set up a scheduler to run work function with params taken from .env and config.ini files. the time is configured in the config.ini file.
+8. Lines 147-151 start the main function and exit if user stopped the program
