@@ -1,11 +1,11 @@
 import pytest
-from src.db_transactions import DataBaseManager
+from src.db_transactions import DataBaseCreator
 from pathlib import Path
 
 
 @pytest.fixture
 def create_db_object():
-    db_transact = DataBaseManager()
+    db_transact = DataBaseCreator()
     return db_transact
 
 
