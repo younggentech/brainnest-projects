@@ -11,7 +11,7 @@ from schedule import repeat, every, run_pending
 from configparser import ConfigParser  # importing file to read configuration params
 
 ##################################
-# FEEL FREE TO MODUFY THIS SECTION
+# FEEL FREE TO MODIFY THIS SECTION
 EMAIL_SUBJECT = ""  # specify the subject
 ATTACHMENTS = []  # specify paths to attachments as strings
 RECIPIENTS = []  # write recipients here as strings
