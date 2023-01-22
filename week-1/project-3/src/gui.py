@@ -13,22 +13,27 @@ class WindowBudget:
         self.txt_fd_habits = Entry()  # input field habits
         self.txt_fd_goalbudget = Entry()  # see comments above
         self.btn1_trx = Button(budget_win, text="Add new transaction")
-        self.b1_trx = Button(budget_win, text="Add new transaction",
-                             command=self.add_new_trx)
+        self.b1_trx = Button(
+            budget_win, text="Add new transaction", command=self.add_new_trx
+        )
 
         self.radiobtn_selector = StringVar(None, "income")
 
-        self.btn5_outcome = Radiobutton(budget_win, text="outcome",
-                                        variable=self.radiobtn_selector,
-                                        value="outcome")
-        self.btn7_income = Radiobutton(budget_win, text="income",
-                                       command=self.radio_button,
-                                       variable=self.radiobtn_selector,
-                                       value="income")
+        self.btn5_outcome = Radiobutton(
+            budget_win, text="outcome", variable=self.radiobtn_selector, value="outcome"
+        )
+        self.btn7_income = Radiobutton(
+            budget_win,
+            text="income",
+            command=self.radio_button,
+            variable=self.radiobtn_selector,
+            value="income",
+        )
 
         self.btn3_goalbudget = Button(budget_win, text="Update Goal Budget")
-        self.b3_goalbudget = Button(budget_win, text="Update Goal Budget",
-                                    command=self.update_goal_budget)
+        self.b3_goalbudget = Button(
+            budget_win, text="Update Goal Budget", command=self.update_goal_budget
+        )
 
         self.lbl_amount.place(x=282, y=180)
         self.txt_fd_amount.place(x=220, y=150)
@@ -44,10 +49,26 @@ class WindowBudget:
         self.btn7_income.place(x=650, y=150)
 
     def add_new_trx(self):
-        timestamp = datetime.now()
+        timestamp = datetime.now().timestamp()
         amount = self.txt_fd_amount.get()
+        if not amount:
+            self.txt_fd_amount.focus_set()
+            self.txt_fd_amount.configure(background="red")
+            return
+        self.txt_fd_amount.configure(
+            background=self.txt_fd_goalbudget["background"]
+        )  # not sure about it, i want to change the background to default
         habits = self.txt_fd_habits.get()
-        print(timestamp, amount, habits)
+        if not habits:
+            self.txt_fd_habits.focus_set()
+            self.txt_fd_habits.configure(background="red")
+            return
+        self.txt_fd_habits.configure(
+            background=self.txt_fd_goalbudget["background"]
+        )  # not sure about it, i want to change the background to default
+
+        type_of_operation = self.radiobtn_selector.get()
+        print(timestamp, amount, habits, type_of_operation)
         # todo: here we can save the row
 
     def update_goal_budget(self):
@@ -59,4 +80,3 @@ class WindowBudget:
         print(self.radiobtn_selector.get())
         # TODO: (Esteban) - initial set values is not gathered
         #   Method returns None or income.
-
