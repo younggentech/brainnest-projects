@@ -5,7 +5,7 @@ from sqlite3 import Error
 from typing import Union
 
 
-class DataBaseManager:
+def open_db():
     pass
 
 
