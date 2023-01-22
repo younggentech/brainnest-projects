@@ -1,8 +1,9 @@
 from tkinter import *
 from datetime import datetime
 
+
 class WindowBudget:
-    def __init__(self, budget_win:object):
+    def __init__(self, budget_win: object):
         self.lbl1 = Label(budget_win, text="Amount")
         self.lbl2 = Label(budget_win, text="Habits")
         self.lbl3 = Label(budget_win, text="Total Budget")
@@ -24,12 +25,13 @@ class WindowBudget:
         self.lbl3.place(x=50, y=50)
         self.txtfd3.place(x=215, y=50)
         self.b3.place(x=50, y=50)
+
     def add_row(self):
         timestamp = datetime.now()
         amount = self.txtfd1.get()
         habits = self.txtfd2.get()
         print(timestamp, amount, habits)
-
+        # todo: here we can save the row
 
     def total_budget(self):
         total_budget = self.txtfd3.get()
