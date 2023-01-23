@@ -3,7 +3,7 @@ import datetime
 from .db_transactions import open_db
 from collections import namedtuple
 
-Transaction = namedtuple("Trx", ["date", "amount", "habits", "type"])
+Transaction = namedtuple("Transaction", ["date", "amount", "habits", "type"])
 
 
 def get_all_transactions():
