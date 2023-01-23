@@ -10,11 +10,6 @@ def start_gui():
     window.mainloop()
 
 
-#     one table: id, amount, reason
-#       on the ui, we have a radio buttons, if income radio is select, the amount will be +
-#       on the ui, we have a radio buttons, if outcome radio is select, the amount will be -
-
-
 def main():
     start_gui()
 
