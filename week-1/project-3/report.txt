@@ -1,0 +1,45 @@
+Group 2 solution for Personal Budgeting App includes these steps:
+1. Import libraries that we use in the project:
+    in main.py file (which is the starting point of the app):
+        1. tkinter - to view the window for the user
+        2. WindowBudget - class from src/gui.py which has the configuration of the app
+    in src/gui.py file:
+        1. tkinter - to add widgets/components on the screen.
+        2. re - to use regex
+        3. matplotlib - to create charts on the view
+        4. get_all_transactions - from ./calls_to_db.py to get all the transactions
+        5. create_a_bar_plot - from ./transaction_calc.py to draw the chart based on the data from the db
+        6. open_db - from ./db_transactions.py to connect to the database.
+        7. datetime - to add date and time to log files
+    in src/calls_to_db.py file:
+        1. datetime - to format the datetime of every transaction
+        2. open_db - from ./db_transactions.py to connect to the database.
+        3. namedtuple - from collections module to create a custom tuple for the transaction's record.
+    in src/db_transactions.py file:
+        1. logging - to create log files and also log info to the console
+        2. os.path - to check the existance of database file
+        3. Path - from pathlib module to specify the path of the db
+        4. connect - from sqlite3 module to connect to db
+        5. Error - from sqlite3 module to handle any exception when connecting to db
+        6. Union - from typing module for type hinting
+        7. contextmanager - from contextlib module to create a methods to be a context manager (i.e to be used with `with` clause)
+    in src/transaction_calc.py file:
+        1. datetime - to format the datetime of every transaction
+        2. sqlite3 - to connect to sqlite db for pandas
+        3. pandas - to prepare the data for matplotlib
+        4. matplotlib.pyplot - to draw charts using the given data
+        5. DATA_BASE_NAME - from src/db_transactions.py which holds the database name.
+
+the usage of the app simply is to run main.py file, and the code will create the database and view the window for the user, from the window, the user can set the goal budget, enter amount, habit, and select whether it's an income or outcome.
+when a user add an amount with a habit, then click on Add new transaction, the values will be saved in the db and the table will be updated with the values from the db, and next to the table, there's a section to show the chart which depends on the transactions' data from the db.
+
+2. created a calls_to_db file to get the list of transaction from the database where each item in the list represents a named tupple.
+    This file is used by gui to render all of the transactions.
+3. created a db_transaction file to operate with database. This file is used to:
+    1. create database using defined and create schema structure
+    2. connect to an existing database
+    3. perform select/insert calls to the databse, including calls with aggregating functions (sum)
+4. created transaction_calc.py to create a bar plot based on the data from the db and view/show the plot on the window.
+5. designed gui interface, so the user can see all the important information without any distractors or the need to search
+ for a section in the app. User can discover any feature of an app in just one screen.
+6. We have also written a bunch of tests related to the database connection.
