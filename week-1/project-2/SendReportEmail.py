@@ -57,11 +57,9 @@ logging.basicConfig(
 @repeat(every().day.at(scheduled_time))
 def main():
     try:
-        logging.info("starting email forming and sending")
+        logging.info('starting email forming and sending')
         smtp = SMTPs.get(
-            sender_email.split("@")[1].split(".")[
-                0
-            ]  # to extract the domain (between @ and .) from email
+            sender_email.split("@")[1].split(".")[0]  # to extract the domain (between @ and .) from email
         )
         msg = MIMEMultipart("alternative")
         msg["Subject"] = EMAIL_SUBJECT  # the subject of the email
@@ -73,26 +71,23 @@ def main():
                     part = MIMEBase("application", "octet-stream")
                     part.set_payload(attach.read())
                 encoders.encode_base64(part)
-                part.add_header(
-                    "Content-Disposition", f"attachment; filename={attachment}"
-                )
+                part.add_header("Content-Disposition",
+                                f"attachment; filename={attachment}")
                 msg.attach(part)
             else:
                 # log that file was not found
-                logging.error(f"file not found {attachment}")
+                logging.error(f'file not found {attachment}')
 
         server = smtplib.SMTP(host=smtp.get("server"), port=PORT)
         server.starttls()
         server.login(sender_email, email_password)
-        logging.info("successful login")
+        logging.info('successful login')
         for recipient in RECIPIENTS:
-            server.sendmail(
-                from_addr=sender_email, to_addrs=[recipient], msg=msg.as_string()
-            )
-            logging.info(f"email was sent to {recipient}")
+            server.sendmail(from_addr=sender_email, to_addrs=[recipient], msg=msg.as_string())
+            logging.info(f'email was sent to {recipient}')
     except Exception as e:
-        logging.error(f"{e}", stack_info=True)
-    logging.info("job finished")
+        logging.error(f'{e}', stack_info=True)
+    logging.info('job finished')
 
 
 if __name__ == "__main__":
