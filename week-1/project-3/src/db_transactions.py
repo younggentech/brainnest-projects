@@ -14,7 +14,9 @@ class DataBaseConnector:
         """Method for initialization of db"""
         self.db_name = name
 
-    def __establish_connection(self, query: str, params: tuple) -> Union[list[tuple], int]:
+    def __establish_connection(
+        self, query: str, params: tuple
+    ) -> Union[list[tuple], int]:
         """Service method for query execution"""
         try:  # trying to connect to database
             sqlite_connection = sqlite_connect(self.db_name)
@@ -38,7 +40,7 @@ class DataBaseConnector:
             cursor.close()
 
     def insert_transaction(
-            self, _timestamp: float, _amount: float, type_of_operation: int, habits: str
+        self, _timestamp: float, _amount: float, type_of_operation: int, habits: str
     ) -> list:
         """Inserts new transaction into budget_trans table"""
         logging.info(
@@ -59,7 +61,7 @@ class DataBaseConnector:
         return self.__establish_connection(query, (timestamp, goal_amount))
 
     def get_all_transactions(self) -> list:
-        """ get all transactions
+        """get all transactions
         Select * from budget_trans
         """
         logging.info(f"get_all_transactions")
@@ -67,15 +69,15 @@ class DataBaseConnector:
         return self.__establish_connection(query, ())
 
     def get_current_goal(self) -> list:
-        """ get the latest goal from db
+        """get the latest goal from db
         Select * with max timestamp
         """
         logging.info(f"get_current_goal")
-        query = f"SELECT * FROM dataGoal WHERE timestamp=MAX(SELECT timestamp from dataGoal)"
+        query = f"SELECT * FROM dataGoal WHERE timestamp=(SELECT MAX(timestamp) from dataGoal)"
         return self.__establish_connection(query, ())
 
     def get_spending_transactions(self) -> list:
-        """ get all the outcome/spending transactions
+        """get all the outcome/spending transactions
         Select * from budget_trans where typeOfOperation=1
         """
         logging.info(f"get_spending_transactions")
@@ -83,11 +85,29 @@ class DataBaseConnector:
         return self.__establish_connection(query, ())
 
     def get_income_transactions(self) -> list:
-        """ get all the income transactions
+        """get all the income transactions
         Select * from budget_trans where typeOfOperation=0
         """
         logging.info(f"get_income_transactions")
         query = f"SELECT * FROM budget_trans WHERE typeOfOperation=0"
+        return self.__establish_connection(query, ())
+
+    def get_total_spendings(self):
+        """
+        Get total spendings/outcome
+        Selects sum(amount) from budget_trans where typeOfOperation=1
+        """
+        logging.info(f"get_total_spendings")
+        query = f"SELECT SUM(amount) FROM budget_trans WHERE typeOfOperation=1"
+        return self.__establish_connection(query, ())
+
+    def get_total_income(self):
+        """
+        Get total income
+        Selects sum(amount) from budget_trans where typeOfOperation=0
+        """
+        logging.info(f"get_total_income")
+        query = f"SELECT SUM(amount) FROM budget_trans WHERE typeOfOperation=0"
         return self.__establish_connection(query, ())
 
 
@@ -161,7 +181,7 @@ def db_create_schema(db_name):
             typeOfOperation INT2,
             habits NVAR(40)
         );
-        
+
         CREATE TABLE IF NOT EXISTS dataGoal (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             timestamp DOUBLE,

@@ -36,12 +36,20 @@ class WindowBudget:
         # The labels which will appear on the view
         self.amount_label = Label(budget_win, text="Amount")  # Amount labels
         self.habits_label = Label(budget_win, text="Habits")  # Habits labels
-        self.goal_budget_label = Label(budget_win, text="Goal Budget")  # Goal labels
+        self.goal_budget_label = Label(budget_win, text="Goal Budget: ")  # Goal labels
+        self.total_spendings_label = Label(
+            budget_win, text="Total spendings: "
+        )  # spendings label
+        self.current_balance_label = Label(
+            budget_win, text="Current Balance: "
+        )  # balance label
 
         # The input fields: amount, habits, and goal on the view
         self.amount_text_field = Entry(textvariable=self.amount)  # Amount input field
         self.habits_text_field = Entry()  # input field habits
-        self.goal_budget_text_field = Entry(textvariable=self.budget)  # see comments above
+        self.goal_budget_text_field = Entry(
+            textvariable=self.budget
+        )  # see comments above
 
         # The add buttons on the view: add new transaction, and update goal budget.
         self.add_transaction_button = Button(
@@ -53,7 +61,10 @@ class WindowBudget:
 
         # The radio buttons for income and outcome
         self.outcome_radio_button = Radiobutton(
-            budget_win, text="outcome", variable=self.radio_button_selector, value="outcome"
+            budget_win,
+            text="outcome",
+            variable=self.radio_button_selector,
+            value="outcome",
         )
         self.income_radio_button = Radiobutton(
             budget_win,
@@ -86,7 +97,10 @@ class WindowBudget:
         self.habits_label.place(x=520, y=180)
         self.habits_text_field.place(x=438, y=150)
 
-        self.goal_budget_label.place(x=400, y=50)
+        self.goal_budget_label.place(x=450, y=50)
+        self.total_spendings_label.place(x=450, y=75)
+        self.current_balance_label.place(x=450, y=100)
+
         self.goal_budget_text_field.place(x=215, y=50)
         self.update_goal_button.place(x=50, y=50)
 
@@ -95,12 +109,55 @@ class WindowBudget:
         self.all_transactions_table.place(x=50, y=250)
 
         self.render_all_transactions()
+        self.render_goal_budget()
+        self.render_total_spending()
+        self.render_balance()
+
+    def render_goal_budget(self):
+        with open_db() as con:
+            goal = con.get_current_goal()
+        if not goal:
+            self.goal_budget_label.configure(text="Goal Budget is not specified")
+        elif not goal[0][2]:
+            self.goal_budget_label.configure(text="Goal Budget is not specified")
+        else:
+            self.goal_budget_label.configure(text=f"Goal Budget: {goal[0][2]}")
+
+    def render_total_spending(self):
+        with open_db() as con:
+            out = con.get_total_spendings()
+        print(out)
+        if not out[0][0]:
+            self.total_spendings_label.configure(text="No spendings yet")
+            return
+        self.total_spendings_label.configure(text=f"Total expenses: {out[0][0]}")
+
+    def render_balance(self):
+        with open_db() as con:
+            out = con.get_total_spendings()
+            _in = con.get_total_income()
+        print(_in, out)
+        if not out[0][0] and not _in[0][0]:
+            self.current_balance_label.configure(text="No Transactions")
+            return
+        elif out[0][0] and not _in[0][0]:
+            self.current_balance_label.configure(text=f"Current balance: -{out[0][0]}")
+        elif not out[0][0] and _in[0][0]:
+            self.current_balance_label.configure(text=f"Current balance: {_in[0][0]}")
+        else:
+            self.current_balance_label.configure(
+                text=f"Current balance: {_in[0][0] - out[0][0]}"
+            )
 
     def render_all_transactions(self):
         self.clear_all_transactions()
         for transactions in get_all_transactions():
             print(transactions)
-            self.all_transactions_table.insert("", "end", text="L1", values=transactions)
+            self.all_transactions_table.insert(
+                "", "end", text="L1", values=transactions
+            )
+        self.render_total_spending()
+        self.render_balance()
 
     def clear_all_transactions(self):
         for item in self.all_transactions_table.get_children():
@@ -128,14 +185,16 @@ class WindowBudget:
         type_of_operation = self.radio_button_selector.get()
         print(timestamp, amount, habits, type_of_operation)
         # todo: here we can save the transaction (DONE)
+        type_of_operation = 0 if type_of_operation.lower() == "income" else 1
         with open_db() as db:
             db.insert_transaction(timestamp, amount, type_of_operation, habits)
         self.render_all_transactions()
 
     def update_goal_budget(self):
         total_budget = self.goal_budget_text_field.get()
-        timestamp = datetime.now()
+        timestamp = datetime.now().timestamp()
         print(total_budget, timestamp)
         # todo: here we can save the goal (DONE)
         with open_db() as db:
             db.insert_goal(timestamp, total_budget)
+        self.render_goal_budget()
