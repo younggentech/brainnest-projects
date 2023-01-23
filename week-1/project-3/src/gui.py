@@ -130,8 +130,11 @@ class WindowBudget:
             self.goal_budget_label.configure(text=f"Goal Budget: {goal[0][2]}")
 
     def update_image(self):
-        self.plot_of_amount = FigureCanvasTkAgg(create_a_bar_plot(), self.b)
-        self.plot_of_amount.get_tk_widget().place(x=390, y=250)
+        try:
+            self.plot_of_amount = FigureCanvasTkAgg(create_a_bar_plot(), self.b)
+            self.plot_of_amount.get_tk_widget().place(x=390, y=250)
+        except:
+            print("no data")
 
     def render_total_spending(self):
         with open_db() as con:
