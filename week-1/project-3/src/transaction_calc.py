@@ -2,10 +2,10 @@ import datetime
 import sqlite3
 import pandas as pd
 import matplotlib.pyplot as plt
-from matplotlib.axes import SubplotBase
+from .db_transactions import DATA_BASE_NAME
 
 
-def read_data_from_sql(db_name="budget_db.db"):
+def read_data_from_sql(db_name=DATA_BASE_NAME):
     try:
         conn = sqlite3.connect(db_name)
         df = pd.read_sql(
@@ -16,7 +16,7 @@ def read_data_from_sql(db_name="budget_db.db"):
         conn.close()
 
 
-def create_a_bar_plot(db_name="budget_db.db", fig=None):
+def create_a_bar_plot(db_name=DATA_BASE_NAME, fig=None):
     df = read_data_from_sql(db_name)[["timestamp", "amount", "typeOfOperation"]]
     df["timestamp"] = df["timestamp"].apply(
         lambda x: datetime.datetime.fromtimestamp(x).strftime("%d.%m.%Y")
