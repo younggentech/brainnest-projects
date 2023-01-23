@@ -1,6 +1,10 @@
 import tkinter as tk
 import re
+
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+
 from .calls_to_db import get_all_transactions
+from .transaction_calc import create_a_bar_plot
 from .db_transactions import open_db
 from tkinter import *
 from datetime import datetime
@@ -25,6 +29,7 @@ class WindowBudget:
     def __init__(self, budget_win: object):
         # String values to hold the amount value, budget value, and the selected radio button
         # from the window
+        self.b = budget_win
         self.amount = tk.StringVar()
         self.amount.trace_add("write", self.validate_amount)
 
@@ -106,12 +111,13 @@ class WindowBudget:
 
         self.outcome_radio_button.place(x=650, y=175)
         self.income_radio_button.place(x=650, y=150)
-        self.all_transactions_table.place(x=50, y=250)
+        self.all_transactions_table.place(x=20, y=250)
 
         self.render_all_transactions()
         self.render_goal_budget()
         self.render_total_spending()
         self.render_balance()
+        self.update_image()
 
     def render_goal_budget(self):
         with open_db() as con:
@@ -122,6 +128,10 @@ class WindowBudget:
             self.goal_budget_label.configure(text="Goal Budget is not specified")
         else:
             self.goal_budget_label.configure(text=f"Goal Budget: {goal[0][2]}")
+
+    def update_image(self):
+        self.plot_of_amount = FigureCanvasTkAgg(create_a_bar_plot(), self.b)
+        self.plot_of_amount.get_tk_widget().place(x=390, y=250)
 
     def render_total_spending(self):
         with open_db() as con:
@@ -158,6 +168,7 @@ class WindowBudget:
             )
         self.render_total_spending()
         self.render_balance()
+        self.update_image()
 
     def clear_all_transactions(self):
         for item in self.all_transactions_table.get_children():
