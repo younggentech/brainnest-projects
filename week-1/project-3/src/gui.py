@@ -1,117 +1,141 @@
+import tkinter as tk
+import re
 from .calls_to_db import get_all_transactions
+from .db_transactions import open_db
 from tkinter import *
 from datetime import datetime
 from tkinter import ttk
 
 
 class WindowBudget:
+
+    # the next functions, to validate the amount and goal fields/values.
+    def validate_amount(self, *values):
+        if not re.fullmatch("[0-9]*", str(self.amount.get())):
+            self.add_transaction_button["state"] = "disabled"
+        else:
+            self.add_transaction_button["state"] = "normal"
+
+    def validate_budget(self, *values):
+        if not re.fullmatch("[0-9]*", str(self.budget.get())):
+            self.update_goal_button["state"] = "disabled"
+        else:
+            self.update_goal_button["state"] = "normal"
+
     def __init__(self, budget_win: object):
-        self.lbl_amount = Label(budget_win, text="Amount")  # Amount labels
-        self.lbl_habits = Label(budget_win, text="Habits")  # Habits labels
-        self.lbl_goalbudget = Label(budget_win, text="Goal Budget")  # Goal labels
-        self.lbl_outcome = Label(budget_win, text="empty")
-        self.lbl_income = Label(budget_win, text="empty")
-        self.txt_fd_amount = Entry()  # Amount input field
-        self.txt_fd_habits = Entry()  # input field habits
-        self.txt_fd_goalbudget = Entry()  # see comments above
-        self.btn1_trx = Button(budget_win, text="Add new transaction")
-        self.b1_trx = Button(
-            budget_win, text="Add new transaction", command=self.add_new_trx
-        )
+        # String values to hold the amount value, budget value, and the selected radio button
+        # from the window
+        self.amount = tk.StringVar()
+        self.amount.trace_add("write", self.validate_amount)
 
-        self.radiobtn_selector = StringVar(None, "income")
+        self.budget = tk.StringVar()
+        self.budget.trace_add("write", self.validate_budget)
 
-        self.btn5_outcome = Radiobutton(
-            budget_win, text="outcome", variable=self.radiobtn_selector, value="outcome"
-        )
-        self.btn7_income = Radiobutton(
-            budget_win,
-            text="income",
-            command=self.radio_button,
-            variable=self.radiobtn_selector,
-            value="income",
-        )
+        self.radio_button_selector = StringVar(None, "income")
 
-        self.btn3_goalbudget = Button(budget_win, text="Update Goal Budget")
-        self.b3_goalbudget = Button(
+        # The labels which will appear on the view
+        self.amount_label = Label(budget_win, text="Amount")  # Amount labels
+        self.habits_label = Label(budget_win, text="Habits")  # Habits labels
+        self.goal_budget_label = Label(budget_win, text="Goal Budget")  # Goal labels
+
+        # The input fields: amount, habits, and goal on the view
+        self.amount_text_field = Entry(textvariable=self.amount)  # Amount input field
+        self.habits_text_field = Entry()  # input field habits
+        self.goal_budget_text_field = Entry(textvariable=self.budget)  # see comments above
+
+        # The add buttons on the view: add new transaction, and update goal budget.
+        self.add_transaction_button = Button(
+            budget_win, text="Add new transaction", command=self.add_new_transaction
+        )
+        self.update_goal_button = Button(
             budget_win, text="Update Goal Budget", command=self.update_goal_budget
         )
 
-        self.all_trx = ttk.Treeview(budget_win, selectmode="browse")
-        verscrlbar = ttk.Scrollbar(
-            budget_win, orient="vertical", command=self.all_trx.yview
+        # The radio buttons for income and outcome
+        self.outcome_radio_button = Radiobutton(
+            budget_win, text="outcome", variable=self.radio_button_selector, value="outcome"
         )
-        verscrlbar.pack(side="right", fill="x")
-        self.all_trx.configure(xscrollcommand=verscrlbar.set)
-        self.all_trx["columns"] = ("1", "2", "3", "4")
-        self.all_trx["show"] = "headings"
+        self.income_radio_button = Radiobutton(
+            budget_win,
+            text="income",
+            variable=self.radio_button_selector,
+            value="income",
+        )
 
-        # Assigning the width and anchor to  the
-        # respective columns
-        self.all_trx.column("1", width=90, anchor="c")
-        self.all_trx.column("2", width=90, anchor="se")
-        self.all_trx.column("3", width=90, anchor="se")
-        self.all_trx.column("4", width=90, anchor="se")
+        # The table to list all the transactions.
+        self.all_transactions_table = ttk.Treeview(budget_win, selectmode="browse")
+        self.all_transactions_table["columns"] = ("1", "2", "3", "4")
+        self.all_transactions_table["show"] = "headings"
 
-        # Assigning the heading names to the
-        # respective columns
-        self.all_trx.heading("1", text="Date")
-        self.all_trx.heading("2", text="Amount")
-        self.all_trx.heading("3", text="Habit")
-        self.all_trx.heading("4", text="Operation")
+        # Assigning the width and anchor to the respective columns
+        self.all_transactions_table.column("1", width=90, anchor="c")
+        self.all_transactions_table.column("2", width=90, anchor="se")
+        self.all_transactions_table.column("3", width=90, anchor="se")
+        self.all_transactions_table.column("4", width=90, anchor="se")
 
-        # self.all_trx.configure(command=mylist.yview)
+        # Assigning the heading names to the respective columns
+        self.all_transactions_table.heading("1", text="Date")
+        self.all_transactions_table.heading("2", text="Amount")
+        self.all_transactions_table.heading("3", text="Habit")
+        self.all_transactions_table.heading("4", text="Operation")
 
-        self.lbl_amount.place(x=282, y=180)
-        self.txt_fd_amount.place(x=220, y=150)
-        self.b1_trx.place(x=50, y=150)
-        self.lbl_habits.place(x=520, y=180)
-        self.txt_fd_habits.place(x=438, y=150)
+        # The locations of the widget on the windows
+        self.amount_label.place(x=282, y=180)
+        self.amount_text_field.place(x=220, y=150)
+        self.add_transaction_button.place(x=50, y=150)
+        self.habits_label.place(x=520, y=180)
+        self.habits_text_field.place(x=438, y=150)
 
-        self.lbl_goalbudget.place(x=50, y=50)
-        self.txt_fd_goalbudget.place(x=215, y=50)
-        self.b3_goalbudget.place(x=50, y=50)
+        self.goal_budget_label.place(x=400, y=50)
+        self.goal_budget_text_field.place(x=215, y=50)
+        self.update_goal_button.place(x=50, y=50)
 
-        self.btn5_outcome.place(x=650, y=175)
-        self.btn7_income.place(x=650, y=150)
-        self.all_trx.place(x=50, y=250)
+        self.outcome_radio_button.place(x=650, y=175)
+        self.income_radio_button.place(x=650, y=150)
+        self.all_transactions_table.place(x=50, y=250)
 
-        self.render_all_trx()
+        self.render_all_transactions()
 
-    def render_all_trx(self):
-        for trx in get_all_transactions():
-            print(trx)
-            self.all_trx.insert("", "end", text="L1", values=trx)
+    def render_all_transactions(self):
+        self.clear_all_transactions()
+        for transactions in get_all_transactions():
+            print(transactions)
+            self.all_transactions_table.insert("", "end", text="L1", values=transactions)
 
-    def add_new_trx(self):
+    def clear_all_transactions(self):
+        for item in self.all_transactions_table.get_children():
+            self.all_transactions_table.delete(item)
+
+    def add_new_transaction(self):
         timestamp = datetime.now().timestamp()
-        amount = self.txt_fd_amount.get()
+        amount = self.amount_text_field.get()
         if not amount:
-            self.txt_fd_amount.focus_set()
-            self.txt_fd_amount.configure(background="red")
+            self.amount_text_field.focus_set()
+            self.amount_text_field.configure(background="red")
             return
-        self.txt_fd_amount.configure(
-            background=self.txt_fd_goalbudget["background"]
-        )  # not sure about it, i want to change the background to default
-        habits = self.txt_fd_habits.get()
+        self.amount_text_field.configure(
+            background=self.goal_budget_text_field["background"]
+        )  # not sure about it, I want to change the background to default
+        habits = self.habits_text_field.get()
         if not habits:
-            self.txt_fd_habits.focus_set()
-            self.txt_fd_habits.configure(background="red")
+            self.habits_text_field.focus_set()
+            self.habits_text_field.configure(background="red")
             return
-        self.txt_fd_habits.configure(
-            background=self.txt_fd_goalbudget["background"]
-        )  # not sure about it, i want to change the background to default
+        self.habits_text_field.configure(
+            background=self.goal_budget_text_field["background"]
+        )  # not sure about it, I want to change the background to default
 
-        type_of_operation = self.radiobtn_selector.get()
+        type_of_operation = self.radio_button_selector.get()
         print(timestamp, amount, habits, type_of_operation)
-        # todo: here we can save the row
+        # todo: here we can save the transaction (DONE)
+        with open_db() as db:
+            db.insert_transaction(timestamp, amount, type_of_operation, habits)
+        self.render_all_transactions()
 
     def update_goal_budget(self):
-        total_budget = self.txt_fd_goalbudget.get()
+        total_budget = self.goal_budget_text_field.get()
         timestamp = datetime.now()
         print(total_budget, timestamp)
-
-    def radio_button(self):
-        print(self.radiobtn_selector.get())
-        # TODO: (Esteban) - initial set values is not gathered
-        #   Method returns None or income.
+        # todo: here we can save the goal (DONE)
+        with open_db() as db:
+            db.insert_goal(timestamp, total_budget)

@@ -24,12 +24,12 @@ def test_db_creation(create_db_file):
 
 @pytest.mark.xfail(raises=FileNotFoundError)
 def test_db_connect_none_file(create_db_file):
-    conn = create_db_file.db_connect("tester.db")
+    conn = create_db_file.connect_to_db("tester.db")
 
 
 def test_db_connection(create_db_file, capsys):
-    conn = create_db_file.db_connect("tmp.db")
+    conn = create_db_file.connect_to_db("tmp.db")
     cursor = conn.cursor()
-    create_db_file.db_close(conn, cursor)
+    create_db_file.close_connection(conn, cursor)
     captured_msg = capsys.readouterr()
     assert captured_msg.out == "All DB connection have been terminated\n"

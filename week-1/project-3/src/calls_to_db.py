@@ -7,12 +7,12 @@ Transaction = namedtuple("Trx", ["date", "amount", "type", "habits"])
 
 
 def get_all_transactions():
-    res = []
-    with open_db() as con:
-        trx = con.get_all_trx()
-    for trans in trx:
-        tmsp = datetime.datetime.fromtimestamp(trans[1]).strftime("%d.%m.%Y")
-        amount = str(trans[2])
-        _type = "Income" if trans[3] == 0 else "Outcome"
-        res.append(Transaction(str(tmsp), amount, _type, trans[4].capitalize()))
-    return res
+    results = []
+    with open_db() as db:
+        transactions = db.get_all_transactions()
+    for transaction in transactions:
+        timestamp = datetime.datetime.fromtimestamp(transaction[1]).strftime("%d.%m.%Y")
+        amount = str(transaction[2])
+        _type = "Income" if transaction[3] == "income" else "Outcome"
+        results.append(Transaction(str(timestamp), amount, _type, str(transaction[4]).capitalize()))
+    return results
