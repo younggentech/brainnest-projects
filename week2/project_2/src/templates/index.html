@@ -19,14 +19,14 @@
                 {{ result.error_message }}
             </div>
         {% endif %}
-        <form method="POST" action="{{ url_for("index") }}">
+        <form method="POST" action="{{ url_for('index') }}">
             <div class="mb-3">
                 <label for="city" class="form-label">City</label>
                 <input type="text" class="form-control" id="city" name="city">
             </div>
             <button type="submit" class="btn btn-primary">Submit</button>
         </form>
-    {#  todo: show city information here with the icons from fontawesome library #}
+        {#  todo: show city information here with the icons from fontawesome library #}
     </div>
 </div>
 
