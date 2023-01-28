@@ -4,11 +4,6 @@ from typing import Union
 
 class AbstractHangman(ABC):
     @abstractmethod
-    def set_word(self, word_data: dict) -> None:
-        """Setting a word to start a game"""
-        pass
-
-    @abstractmethod
     def check_letter(self, letter: str) -> dict:
         """Check if letter exists, returns a dict with known letters and their positions"""
         pass
@@ -20,8 +15,8 @@ class AbstractHangman(ABC):
 
 
 class Hangman(AbstractHangman):
-    def __init__(self, word_data: dict):
-        self.__words_details = word_data
+    def __init__(self, words_details):
+        self.words_details = words_details
 
     def finish_game(self) -> Union[bool, dict]:
         pass
@@ -29,9 +24,19 @@ class Hangman(AbstractHangman):
     def check_letter(self, letter: str) -> dict:
         pass
 
-    def set_word(self, word_data: dict) -> None:
-        pass
+    @property
+    def words_details(self):
+        return self.__words_details
+
+    @words_details.setter
+    def words_details(self, word_data: dict):
+        if not isinstance(word_data, dict):
+            raise TypeError("word_data should be dict")
+        if not word_data.get("definitions"):
+            raise ValueError("definitions should exist")
+        self.__words_details = word_data
 
 
 if __name__ == "__main__":
-    h = Hangman("love")
+    h = Hangman("ads")
+    print(h.words_details)
