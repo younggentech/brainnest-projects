@@ -23,7 +23,6 @@ def index():
         result = post(f"{apiURL}?key={apiKey}&q={city}")
         if result.status_code == 200:
             result = result.json()
-            print(result)
             return render_template("index.html", result=result)
         else:
             error: dict = result.json().get("error")
@@ -34,5 +33,4 @@ def index():
 
 
 if __name__ == "__main__":
-    # app.run(debug=True, port=5000, host="0.0.0.0")
     app.run(debug=True)
