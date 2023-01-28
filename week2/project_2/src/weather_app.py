@@ -2,6 +2,7 @@
 from pathlib import Path
 from configparser import ConfigParser
 from requests import post
+from weather_api import get_weather_data
 from flask import Flask, render_template, request
 
 app = Flask(__name__)
@@ -23,6 +24,7 @@ def index():
         result = post(f"{apiURL}?key={apiKey}&q={city}")
         if result.status_code == 200:
             result = result.json()
+            result = list(get_weather_data(result))
             return render_template("index.html", result=result)
         else:
             error: dict = result.json().get("error")
