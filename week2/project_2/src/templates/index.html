@@ -31,10 +31,12 @@
     <div>
         {% if result %}
         <table>
-            <thead>The Weather in {{ result[1] }}</thead>
-            <tbody>
-            {% for item in result %}
-                <td> {{ item }} </td>
+            <thead>The Weather in City {{ result.pop('name') }} - {{ result.pop('country') }}</thead>
+            <tbody >
+            {% for key, item in result.items()%}
+            <tr>
+                <td colspan="2"> {{key}} -- {{ item }} </td>
+            </tr>
             {% endfor %}
             </tbody>
         </table>

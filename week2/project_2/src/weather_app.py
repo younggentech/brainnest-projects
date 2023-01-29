@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import json
 from pathlib import Path
 from configparser import ConfigParser
 from requests import post
@@ -24,7 +25,7 @@ def index():
         result = post(f"{apiURL}?key={apiKey}&q={city}")
         if result.status_code == 200:
             result = result.json()
-            result = list(get_weather_data(result))
+            result = get_weather_data(result)
             return render_template("index.html", result=result)
         else:
             error: dict = result.json().get("error")
