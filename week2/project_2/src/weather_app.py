@@ -3,7 +3,7 @@ import json
 from pathlib import Path
 from configparser import ConfigParser
 from requests import post
-from weather_api import get_weather_data
+from weather_api import data_parser
 from flask import Flask, render_template, request
 
 app = Flask(__name__)
@@ -25,7 +25,7 @@ def index():
         result = post(f"{apiURL}?key={apiKey}&q={city}")
         if result.status_code == 200:
             result = result.json()
-            result = get_weather_data(result)
+            result = data_parser(result)
             return render_template("index.html", result=result)
         else:
             # TODO: Error if API-key is missing -> else does not cover

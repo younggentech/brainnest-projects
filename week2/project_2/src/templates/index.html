@@ -29,13 +29,21 @@
         {#  todo: show city information here with the icons from fontawesome library #}
     </div>
     <div>
-        {% if not result.get("error_message") %} {# Can you so that the line 'The Weather is not shown'}
+
+        {% if result %}
+        {# Can you so that the line 'The Weather is not shown #}
         <table>
             <thead>The Weather in City {{ result.pop('name') }} - {{ result.pop('country') }}</thead>
             <tbody >
             {% for key, item in result.items()%}
             <tr>
-                <td colspan="2"> {{key}} -- {{ item }} </td>
+                {% if key == "icon" %}
+                <td colspan="2"> {{ result.get("text") }} &emsp; <img src="{{ item }}"> </td>
+                {% elif key == "text" %}
+                <td>Today's forecast is predicted to be: {{ item }}</td>
+                {% else %}
+                <td colspan="2"> {{ key }} &emsp; {{ item }} </td>
+                {% endif %}
             </tr>
             {% endfor %}
             </tbody>
