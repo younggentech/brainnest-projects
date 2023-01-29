@@ -28,6 +28,8 @@ def index():
             result = get_weather_data(result)
             return render_template("index.html", result=result)
         else:
+            # TODO: Error if API-key is missing -> else does not cover
+            #  exception
             error: dict = result.json().get("error")
             if int(error.get("code")) == 1006:
                 _result = dict(error_message="No City matched the given name.")

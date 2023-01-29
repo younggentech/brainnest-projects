@@ -29,7 +29,7 @@
         {#  todo: show city information here with the icons from fontawesome library #}
     </div>
     <div>
-        {% if result %}
+        {% if not result.get("error_message") %} {# Can you so that the line 'The Weather is not shown'}
         <table>
             <thead>The Weather in City {{ result.pop('name') }} - {{ result.pop('country') }}</thead>
             <tbody >
