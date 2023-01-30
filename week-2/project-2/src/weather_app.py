@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import json
 from pathlib import Path
 from configparser import ConfigParser
 from requests import post
@@ -16,11 +15,26 @@ POST = "POST"
 GET = "GET"
 
 
+def get_error_message(error: dict):
+    """this dictionary is for error message based on the error code from the api
+    :param error: a dictionary which will hold error description.
+    """
+    error_messages = {
+        1003: "Enter City name.",
+        1006: "No City matched the given name.",
+        2008: "API key has been disabled.",
+    }
+    return error_messages[int(error.get("code"))]
+
+
 @app.route("/", methods=[POST, GET])
 def index():
     if request.method == GET:
         return render_template("index.html", result={})
     elif request.method == POST:
+        if not apiKey:
+            result = dict(error_message="No API key is provided.")
+            return render_template("index.html", result=result)
         city = request.form.to_dict().pop("city")
         result = post(f"{apiURL}?key={apiKey}&q={city}")
         if result.status_code == 200:
@@ -28,13 +42,8 @@ def index():
             result = data_parser(result)
             return render_template("index.html", result=result)
         else:
-            # TODO: Error if API-key is missing -> else does not cover
-            #  exception
-            error: dict = result.json().get("error")
-            if int(error.get("code")) == 1006:
-                _result = dict(error_message="No City matched the given name.")
-                return render_template("index.html", result=_result)
-        return render_template("index.html", result={})
+            result = dict(error_message=get_error_message(result.json().get("error")))
+            return render_template("index.html", result=result)
 
 
 if __name__ == "__main__":
