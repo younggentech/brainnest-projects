@@ -1,14 +1,18 @@
 import json
 import random
-from typing import List, Tuple
-
-from hangman import Hangman
+import pathlib
+from typing import List
+from setuptools import setup, find_packages
+from .hangman import Hangman
 
 
 def choose_a_random_word() -> dict:
     """A function aimed at choosing a random json dict with the word and its definition from predifined saved file"""
     random_letter_number = random.randrange(97, 123)
-    with open(f"./words/{chr(random_letter_number)}.json", "r") as f:
+    with open(
+        f"{pathlib.Path(__file__).parent.resolve()}/words/{chr(random_letter_number)}.json",
+        "r",
+    ) as f:
         detail = json.load(f)
     w_d = random.choice(detail.get("res"))
     return w_d
@@ -24,7 +28,7 @@ def render_word_state(hangman: Hangman) -> List[str]:
     return word_state
 
 
-if __name__ == "__main__":
+def play():
     try:
         print("Play Hangman!")
         h = Hangman(choose_a_random_word(), 6)
@@ -37,7 +41,6 @@ if __name__ == "__main__":
             letter = input("Guess a letter: ")
             h.check_letter(letter)
             used_letters.append(letter)
-        state = render_word_state(h)
         print(f'You have no tries left. Used letters: {" ".join(used_letters)}')
         if h.finish_game()[1]["isWin"]:
             print("Congratulations! You won!")
