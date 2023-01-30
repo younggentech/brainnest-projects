@@ -14,6 +14,11 @@ class AbstractHangman(ABC):
         """Finishes the game and returns the results of the game"""
         pass
 
+    @abstractmethod
+    def word_len(self) -> dict:
+        """Returns tha length of the world"""
+        pass
+
 
 class Hangman(AbstractHangman):
     def __init__(self, words_details: dict, attempts: int):
@@ -23,6 +28,9 @@ class Hangman(AbstractHangman):
             "letters": set(),
             "letter_to_position": defaultdict(lambda: []),
         }
+
+    def word_len(self) -> dict:
+        return {"length": len(self.words_details["word"])}
 
     def finish_game(self) -> Union[bool, dict]:
         if len(self.__guessed["letters"]) == len(set(self.words_details["word"])):
@@ -49,7 +57,7 @@ class Hangman(AbstractHangman):
         return resp | self.finish_game()[1]
 
     def get_current_letter_state(self) -> dict:
-        return self.__guessed["letter_to_position"]
+        return self.__guessed
 
     @property
     def attempts(self):
