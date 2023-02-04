@@ -13,24 +13,22 @@ app = create_app()
 GET, POST, PATCH, DELETE = "GET", "POST", "PATCH", "DELETE"
 
 
-# def validate(fields):
-#     def validate_request(func):
-#         with app.request_context(fields):
-#             data: dict = request.get_json()
-#             for field in fields:
-#                 if not data.get(field):
-#                     return f"enter all fields {' '.join([str(_field) for _field in fields])}.", 403
-#         return func()
-#
-#     return validate_request
+def validate(fields):
+    def decorator(func):
+        def wrapper(*args, **kwargs):
+            data: dict = request.get_json()
+            missing_fields = list(set(fields).difference(set(data.keys())))
+            if missing_fields:
+                return f"missing: {', '.join([field for field in missing_fields])}.", 403
+            return func(*args, **kwargs)
+        return wrapper
+    return decorator
 
 
 @app.route("/", methods=[GET])
 def index():
     todos = Todo.query.all()
-    return jsonify({
-        "todos": [todo.to_dict() for todo in todos]
-    })
+    return jsonify([todo.to_dict() for todo in todos])
 
 
 @app.route("/<int:todo_id>", methods=[GET])
@@ -40,12 +38,10 @@ def get_todo(todo_id):
 
 
 @app.route("/", methods=[POST])
-# @validate(fields=["title", "description"])
+@validate(fields=["title", "description"])
 def add_todo():
     data: dict = request.get_json()
-    if not (data.get("title") and data.get("description")):
-        return "Enter the title and the description.", 403
-    todo = Todo(title=data.get("title"), desc=data.get("description"))
+    todo = Todo(title=data.get("title"), description=data.get("description"))
     todo.save()
     return index()
 
@@ -56,8 +52,8 @@ def update_todo(todo_id):
     if not todo:
         return "Not Found", 404
     data: dict = request.get_json()
-    todo.title = data.get("title") if data.get("title") else todo.title
-    todo.desc = data.get("description") if data.get("description") else todo.desc
+    todo.title = data.get("title", todo.title)
+    todo.desc = data.get("description", todo.desc)
     todo.update()
     return index()
 
