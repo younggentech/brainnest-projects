@@ -17,7 +17,7 @@ def setup_db(app):
 class Todo(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(20), nullable=False)
-    desc = db.Column(db.String(255))
+    description = db.Column(db.String(255))
 
     def __repr__(self):
         return f"<{self.id}: {self.title}"
@@ -55,5 +55,5 @@ class Todo(db.Model):
         return {
             "id": self.id,
             "title": self.title,
-            "description": self.desc,
+            "description": self.description,
         }
