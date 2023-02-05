@@ -1,5 +1,5 @@
 const GET = "GET", POST = "POST", DELETE = "DELETE", PATCH = "PATCH"
-const host = "http://localhost:5000"
+const host = "http://localhost:5050"
 
 // todo: create a function to create a todo
 function create_todo() {
@@ -21,7 +21,9 @@ function create_todo() {
 function update_todo(event) {
     const todo = event.currentTarget.todo
     console.log(todo)
+
 }
+
 
 function delete_todo(event) {
     const todo = event.currentTarget.todo
@@ -56,9 +58,10 @@ function list_todos() {
                 headerRow.insertCell().innerHTML = "<b>id</b>"
                 headerRow.insertCell().innerHTML = "<b>title</b>"
                 headerRow.insertCell().innerHTML = "<b>description</b>"
+                headerRow.insertCell().innerHTML = "<b>completed</b>"
 
                 let optionsCell = headerRow.insertCell()
-                optionsCell.colSpan = 2
+                optionsCell.colSpan = 3
                 optionsCell.innerHTML = "<b>Options</b>"
 
                 let body = table.createTBody()
@@ -70,6 +73,9 @@ function list_todos() {
                     bodyRowCell.innerHTML = todo.title
                     bodyRowCell = bodyRow.insertCell()
                     bodyRowCell.innerHTML = todo.description
+                    bodyRowCell = bodyRow.insertCell()
+                    bodyRowCell.innerHTML = todo.completed
+
 
                     // the edit button
                     bodyRowCell = bodyRow.insertCell()

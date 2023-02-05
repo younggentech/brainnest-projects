@@ -55,6 +55,7 @@ def update_todo(todo_id):
     data: dict = request.get_json()
     todo.title = data.get("title", todo.title)
     todo.desc = data.get("description", todo.desc)
+    todo.completed = data.get("completed", todo.completed)
     todo.update()
     return "Todo Updated Successfully.", 200
 
@@ -78,4 +79,4 @@ def not_found(error):
 
 # TODO: add change the completion of a todo.
 if __name__ == '__main__':
-    app.run(port=5000, host="0.0.0.0")
+    app.run(port=5050, host="0.0.0.0")
