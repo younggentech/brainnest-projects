@@ -118,8 +118,7 @@ function list_todos() {
                         document.getElementById("todoDescription").value = todo.description
                         const btn = document.getElementById("saveTodo")
                         btn.innerText = "Update"
-                        btn.removeEventListener("click", () => {
-                        })
+                        btn.removeEventListener("click", create_todo)
                         btn.todo = todo
                         btn.addEventListener("click", update_todo)
                         modal.toggle();
@@ -151,9 +150,11 @@ function list_todos() {
 
 window.onload = list_todos
 document.getElementById("addTodo").addEventListener("click", () => {
+    document.getElementById("saveTodo").removeEventListener("click", update_todo);
     document.getElementById("staticBackdropLabel").innerText = "Add New Todo";
     document.getElementById("todoTitle").value = ""
     document.getElementById("todoDescription").value = ""
-    modal.toggle();
+    document.getElementById("saveTodo").value = "Save"
     document.getElementById("saveTodo").addEventListener("click", create_todo);
+    modal.toggle();
 })
