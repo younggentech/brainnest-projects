@@ -1,27 +1,44 @@
 const GET = "GET", POST = "POST", DELETE = "DELETE", PATCH = "PATCH"
 const host = "http://localhost:5050"
 
-// todo: create a function to create a todo
+
+const modal = new bootstrap.Modal(document.getElementById("staticBackdrop"));
+
 function create_todo() {
+    const title = document.getElementById("todoTitle").value
+    const description = document.getElementById("todoDescription").value
     fetch(`${host}/`, {
         method: POST, headers: {
             "Content-Type": "application/json"
         }, body: JSON.stringify({
-            "title": "default title", "description": "default description"
+            "title": `${title}`, "description": `${description}`
         })
     }).then(result => {
         if (result.ok) {
             alert("Todo Added Successfully.")
+            modal.toggle();
             list_todos()
         }
     })
 }
 
-// todo: create a function to update a todo
 function update_todo(event) {
     const todo = event.currentTarget.todo
-    console.log(todo)
-
+    const title = document.getElementById("todoTitle").value
+    const description = document.getElementById("todoDescription").value
+    fetch(`${host}/${todo.id}`, {
+        method: PATCH, headers: {
+            "Content-Type": "application/json"
+        }, body: JSON.stringify({
+            "title": `${title}`, "description": `${description}`
+        })
+    }).then(result => {
+        if (result.ok) {
+            alert("Todo Updated Successfully.")
+            modal.toggle();
+            list_todos()
+        }
+    })
 }
 
 
@@ -37,6 +54,17 @@ function delete_todo(event) {
             }
         })
     }
+}
+
+
+function complete_todo(todoID) {
+    fetch(`${host}/toggle/${todoID}`, {
+        method: PATCH
+    }).then(result => {
+        if (result.ok) {
+            list_todos()
+        }
+    })
 }
 
 function list_todos() {
@@ -67,6 +95,7 @@ function list_todos() {
                 let body = table.createTBody()
                 for (let todo of todos) {
                     const bodyRow = body.insertRow()
+                    if (todo.completed) bodyRow.style.textDecoration = "line-through"
                     let bodyRowCell = bodyRow.insertCell()
                     bodyRowCell.innerHTML = todo.id
                     bodyRowCell = bodyRow.insertCell()
@@ -74,7 +103,7 @@ function list_todos() {
                     bodyRowCell = bodyRow.insertCell()
                     bodyRowCell.innerHTML = todo.description
                     bodyRowCell = bodyRow.insertCell()
-                    bodyRowCell.innerHTML = todo.completed
+                    bodyRowCell.innerHTML = `<input type="checkbox" ${todo.completed ? "checked" : ""} name="todo${todo.id}" id="todo${todo.id}" onclick="complete_todo(${todo.id})">`
 
 
                     // the edit button
@@ -82,9 +111,19 @@ function list_todos() {
                     const editBtn = document.createElement("button")
                     editBtn.className = "btn btn-outline-info"
                     editBtn.innerText = "Edit"
-                    editBtn.todo = todo
                     // todo: here when click on edit button, show the edit dialog. editBtn.onclick
-                    editBtn.addEventListener("click", update_todo, false)
+                    editBtn.addEventListener("click", () => {
+                        document.getElementById("staticBackdropLabel").innerText = "Edit Todo";
+                        document.getElementById("todoTitle").value = todo.title
+                        document.getElementById("todoDescription").value = todo.description
+                        const btn = document.getElementById("saveTodo")
+                        btn.innerText = "Update"
+                        btn.removeEventListener("click", () => {
+                        })
+                        btn.todo = todo
+                        btn.addEventListener("click", update_todo)
+                        modal.toggle();
+                    }, false)
                     bodyRowCell.append(editBtn)
 
                     // the delete button
@@ -111,4 +150,10 @@ function list_todos() {
 }
 
 window.onload = list_todos
-document.getElementById("addTodo").addEventListener("click", create_todo)
+document.getElementById("addTodo").addEventListener("click", () => {
+    document.getElementById("staticBackdropLabel").innerText = "Add New Todo";
+    document.getElementById("todoTitle").value = ""
+    document.getElementById("todoDescription").value = ""
+    modal.toggle();
+    document.getElementById("saveTodo").addEventListener("click", create_todo);
+})
