@@ -54,7 +54,7 @@ def update_todo(todo_id):
     todo = Todo.query.get_or_404(todo_id)
     data: dict = request.get_json()
     todo.title = data.get("title", todo.title)
-    todo.desc = data.get("description", todo.description)
+    todo.description = data.get("description", todo.description)
     todo.completed = data.get("completed", todo.completed)
     todo.update()
     return "Todo Updated Successfully.", 200
