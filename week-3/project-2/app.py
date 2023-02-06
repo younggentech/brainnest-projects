@@ -54,7 +54,7 @@ def update_todo(todo_id):
     todo = Todo.query.get_or_404(todo_id)
     data: dict = request.get_json()
     todo.title = data.get("title", todo.title)
-    todo.desc = data.get("description", todo.desc)
+    todo.desc = data.get("description", todo.description)
     todo.completed = data.get("completed", todo.completed)
     todo.update()
     return "Todo Updated Successfully.", 200
@@ -77,6 +77,13 @@ def not_found(error):
     return jsonify("Bad Request"), 400
 
 
-# TODO: add change the completion of a todo.
+@app.route("/toggle/<int:todo_id>", methods=[PATCH])
+def toggle_todo(todo_id):
+    todo = Todo.query.get_or_404(todo_id)
+    todo.completed = not todo.completed
+    todo.update()
+    return "Todo Updated Successfully.", 200
+
+
 if __name__ == '__main__':
     app.run(port=5050, host="0.0.0.0")
