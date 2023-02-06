@@ -1,1 +1,11 @@
 Week3 report
+a simple todo web app + the api
+how to use:
+1. clone the week3
+2. install the requirements from project-2
+3. run the flask app
+4. open the index.html file
+5. there's a button to add a new todo, after adding the todo, the list of todos will be refreshed
+    5.1 in the list a checkbox to toggle the completion of the todo
+    5.2 a button to edit the todo's data
+    5.3 a button to delete the todo
