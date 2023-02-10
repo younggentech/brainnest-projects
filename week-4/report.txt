@@ -1,0 +1,13 @@
+CountDown App
+This a simple countdown app that will take a number from the user
+and then print a clock-like counter till the end (0)
+
+when user enters non-numeric value, the app will raise ValueError exception
+asking the user for numbers only.
+when user enters number less than 0, the app will ask the user for a number >= 0
+
+when user enter number > 0 (e.g. 100), the app will print
+"the counter 100 will run for 0 hours, 1 minute, and 40 seconds"
+then the clock-like counter will start ticking till 0 (on the same line)
+0:1:40, then 0:1:39 ...
+till 0:0:0 then the app will exit
